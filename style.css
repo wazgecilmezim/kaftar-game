@@ -1,0 +1,116 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Share+Tech+Mono&display=swap');
+
+:root {
+    --bg: #050a14;
+    --panel: rgba(8, 18, 38, 0.92);
+    --neon-blue: #00d4ff;
+    --neon-purple: #b44fff;
+    --neon-yellow: #ffe800;
+    --btn-bg: #0d1f3c;
+    --btn-shadow: #020810;
+}
+
+* {
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: var(--bg);
+    font-family: 'Share Tech Mono', monospace;
+}
+
+#app {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: env(safe-area-inset-top, 10px) 10px env(safe-area-inset-bottom, 10px);
+    z-index: 1;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 360px;
+}
+
+.logo {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 18px;
+    font-weight: 900;
+    background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.score-val {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 24px;
+    color: var(--neon-yellow);
+}
+
+.mid-row {
+    display: flex;
+    gap: 10px;
+    flex: 1;
+    align-items: center;
+}
+
+#boardCanvas {
+    background: #000;
+    border-radius: 8px;
+    box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
+}
+
+.side-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.mini-card {
+    background: var(--panel);
+    border: 1px solid rgba(0,212,255,0.2);
+    border-radius: 8px;
+    padding: 5px;
+    text-align: center;
+}
+
+.controls {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    width: 100%;
+    max-width: 360px;
+    padding-bottom: 10px;
+}
+
+.ctrl-btn, .restart-btn {
+    aspect-ratio: 1;
+    border-radius: 12px;
+    border: none;
+    background: var(--btn-bg);
+    color: white;
+    font-size: 20px;
+    box-shadow: 0 4px var(--btn-shadow);
+}
+
+.restart-btn { background: #e85522; }
+
+footer {
+    font-size: 10px;
+    color: gray;
+    padding-bottom: 5px;
+}
