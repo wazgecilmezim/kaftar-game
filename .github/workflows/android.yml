@@ -74,21 +74,17 @@ jobs:
           }
           GRADLE
 
-      - name: Decode Keystore from Secret
-        run: |
-          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > $GITHUB_WORKSPACE/kaftar-release.keystore
-
       - name: Make Gradle wrapper executable
         run: chmod +x android/gradlew
 
-      - name: Build AAB (Release)
+      - name: Build AAB (Release - unsigned)
         run: |
           cd android
           ./gradlew bundleRelease \
-            -Pandroid.injected.signing.store.file=$GITHUB_WORKSPACE/kaftar-release.keystore \
-            -Pandroid.injected.signing.store.password=${{ secrets.KEYSTORE_PASSWORD }} \
-            -Pandroid.injected.signing.key.alias=${{ secrets.KEY_ALIAS }} \
-            -Pandroid.injected.signing.key.password=${{ secrets.KEY_PASSWORD }}
+            -Pandroid.injected.signing.store.file="" \
+            -Pandroid.injected.signing.store.password="" \
+            -Pandroid.injected.signing.key.alias="" \
+            -Pandroid.injected.signing.key.password=""
 
       - name: Upload AAB artifact
         uses: actions/upload-artifact@v4
