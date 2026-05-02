@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>KAFTAR GAME</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+    <div class="header">
+        <div class="logo">KAFTAR GAME</div>
+        <div class="score-block">
+            <div class="score-lbl">SKOR</div>
+            <div class="score-val" id="scoreDisplay">0</div>
+        </div>
+    </div>
+
+    <div class="mid-row">
+        <div class="board-wrap">
+            <canvas id="boardCanvas"></canvas>
+        </div>
+        <div class="side-panel">
+            <div class="mini-card">
+                <div class="mini-lbl">SONRAKİ</div>
+                <canvas id="nextCanvas" width="56" height="56"></canvas>
+            </div>
+            <div class="mini-card">
+                <div class="mini-lbl">SEVİYE</div>
+                <div class="level-val" id="levelDisplay">1</div>
+            </div>
+            <div class="mini-card">
+                <div class="mini-lbl">SATIR</div>
+                <div class="lines-val" id="linesDisplay">0</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="status-bar" id="gameStatusText">▶ OYNANIYOR</div>
+
+    <div class="controls">
+        <button class="ctrl-btn" id="moveLeft">◀</button>
+        <button class="ctrl-btn" id="rotateBtn">↻</button>
+        <button class="ctrl-btn" id="moveRight">▶</button>
+        <button class="ctrl-btn" id="hardDropBtn">⬇</button>
+        <button class="restart-btn" id="restartBtn">↺</button>
+    </div>
+
+    <footer>KAFTAR MEDIA™</footer>
+</div>
+<script src="game.js"></script>
+</body>
+</html>
