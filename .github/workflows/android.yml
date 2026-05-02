@@ -61,12 +61,9 @@ jobs:
       - name: Update Android plugins
         run: npx cap update android
 
-      - name: Fix Kotlin stdlib and configure unsigned release
+      - name: Fix Kotlin stdlib duplicate classes
         run: |
-          BUILD_GRADLE="android/app/build.gradle"
-
-          # Fix Kotlin stdlib duplicates
-          cat >> "$BUILD_GRADLE" << 'GRADLE'
+          cat >> android/app/build.gradle << 'GRADLE'
 
           configurations.all {
               resolutionStrategy {
@@ -77,34 +74,21 @@ jobs:
           }
           GRADLE
 
-          # Remove any existing signingConfigs and set release to unsigned
-          python3 - << 'PYEOF'
-          import re
-
-          with open("android/app/build.gradle", "r") as f:
-              content = f.read()
-
-          # Replace releaseSigningConfig reference in buildTypes with no signing
-          content = re.sub(
-              r'(release\s*\{[^}]*?)signingConfig\s+signingConfigs\.[^\n]+\n',
-              r'\1',
-              content,
-              flags=re.DOTALL
-          )
-
-          with open("android/app/build.gradle", "w") as f:
-              f.write(content)
-
-          print("build.gradle patched successfully")
-          PYEOF
+      - name: Decode Keystore
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > $GITHUB_WORKSPACE/kaftar-release.keystore
 
       - name: Make Gradle wrapper executable
         run: chmod +x android/gradlew
 
-      - name: Build AAB (Release - unsigned)
+      - name: Build AAB (Release - signed)
         run: |
           cd android
-          ./gradlew bundleRelease
+          ./gradlew bundleRelease \
+            -Pandroid.injected.signing.store.file=$GITHUB_WORKSPACE/kaftar-release.keystore \
+            -Pandroid.injected.signing.store.password=${{ secrets.KEYSTORE_PASSWORD }} \
+            -Pandroid.injected.signing.key.alias=${{ secrets.KEY_ALIAS }} \
+            -Pandroid.injected.signing.key.password=${{ secrets.KEY_PASSWORD }}
 
       - name: Upload AAB artifact
         uses: actions/upload-artifact@v4
