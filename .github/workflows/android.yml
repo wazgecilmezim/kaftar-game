@@ -74,18 +74,9 @@ jobs:
           }
           GRADLE
 
-      - name: Generate Keystore
+      - name: Decode Keystore from Secret
         run: |
-          keytool -genkeypair \
-            -v \
-            -keystore kaftar-release.keystore \
-            -alias kaftar \
-            -keyalg RSA \
-            -keysize 2048 \
-            -validity 10000 \
-            -storepass kaftarmedia123 \
-            -keypass kaftarmedia123 \
-            -dname "CN=Kaftar Media, OU=Games, O=Kaftar Media, L=Istanbul, S=Istanbul, C=TR"
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > $GITHUB_WORKSPACE/kaftar-release.keystore
 
       - name: Make Gradle wrapper executable
         run: chmod +x android/gradlew
@@ -95,12 +86,12 @@ jobs:
           cd android
           ./gradlew bundleRelease \
             -Pandroid.injected.signing.store.file=$GITHUB_WORKSPACE/kaftar-release.keystore \
-            -Pandroid.injected.signing.store.password=kaftarmedia123 \
-            -Pandroid.injected.signing.key.alias=kaftar \
-            -Pandroid.injected.signing.key.password=kaftarmedia123
+            -Pandroid.injected.signing.store.password=${{ secrets.KEYSTORE_PASSWORD }} \
+            -Pandroid.injected.signing.key.alias=${{ secrets.KEY_ALIAS }} \
+            -Pandroid.injected.signing.key.password=${{ secrets.KEY_PASSWORD }}
 
       - name: Upload AAB artifact
         uses: actions/upload-artifact@v4
         with:
-          name: kaftar-game-release
+          name: kaftar-game-release-aab
           path: android/app/build/outputs/bundle/release/app-release.aab
