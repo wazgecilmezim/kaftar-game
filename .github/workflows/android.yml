@@ -61,9 +61,12 @@ jobs:
       - name: Update Android plugins
         run: npx cap update android
 
-      - name: Fix Kotlin stdlib duplicate classes
+      - name: Fix Kotlin stdlib and configure unsigned release
         run: |
-          cat >> android/app/build.gradle << 'GRADLE'
+          BUILD_GRADLE="android/app/build.gradle"
+
+          # Fix Kotlin stdlib duplicates
+          cat >> "$BUILD_GRADLE" << 'GRADLE'
 
           configurations.all {
               resolutionStrategy {
@@ -74,17 +77,34 @@ jobs:
           }
           GRADLE
 
+          # Remove any existing signingConfigs and set release to unsigned
+          python3 - << 'PYEOF'
+          import re
+
+          with open("android/app/build.gradle", "r") as f:
+              content = f.read()
+
+          # Replace releaseSigningConfig reference in buildTypes with no signing
+          content = re.sub(
+              r'(release\s*\{[^}]*?)signingConfig\s+signingConfigs\.[^\n]+\n',
+              r'\1',
+              content,
+              flags=re.DOTALL
+          )
+
+          with open("android/app/build.gradle", "w") as f:
+              f.write(content)
+
+          print("build.gradle patched successfully")
+          PYEOF
+
       - name: Make Gradle wrapper executable
         run: chmod +x android/gradlew
 
       - name: Build AAB (Release - unsigned)
         run: |
           cd android
-          ./gradlew bundleRelease \
-            -Pandroid.injected.signing.store.file="" \
-            -Pandroid.injected.signing.store.password="" \
-            -Pandroid.injected.signing.key.alias="" \
-            -Pandroid.injected.signing.key.password=""
+          ./gradlew bundleRelease
 
       - name: Upload AAB artifact
         uses: actions/upload-artifact@v4
