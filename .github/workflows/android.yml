@@ -38,7 +38,7 @@ jobs:
         run: |
           cat > capacitor.config.json << 'EOF'
           {
-            "appId": "com.kaftarmedia.game",
+            "appId": "com.kaftarmedia.game2",
             "appName": "KAFTAR GAME",
             "webDir": "www",
             "bundledWebRuntime": false
