@@ -1,0 +1,14 @@
+{
+  "name": "kaftar-game",
+  "version": "1.0.0",
+  "description": "Kaftar Game Tetris Edition",
+  "main": "index.js",
+  "dependencies": {
+    "@capacitor/android": "^5.0.0",
+    "@capacitor/cli": "^5.0.0",
+    "@capacitor/core": "^5.0.0"
+  },
+  "scripts": {
+    "build": "mkdir -p www && cp index.html style.css game.js privacy.html www/"
+  }
+}
