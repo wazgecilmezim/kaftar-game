@@ -46,17 +46,16 @@ jobs:
           cp index.html www/
           cp game.js www/
           cp style.css www/
-          # Varsa privacy dosyasını da ekleyelim
-          cp privacy.html www/ || true
+          cp privacy.html www/
 
       - name: Add Android platform
         run: npx cap add android
 
-      - name: Fix App Name and Package (Google Policy Fix)
+      - name: Fix Google Play Name Policy
         run: |
-          # Google'ın reddetme sebebini burada çözüyoruz: İsimleri her yerde KAFTAR GAME yapıyoruz.
+          # Uygulama adını her yerde KAFTAR GAME olarak zorla düzeltiyoruz.
+          # Bu adım Google'ın "Misleading Claims" hatasını çözen ana kısımdır.
           sed -i 's/Capacitor App/KAFTAR GAME/g' android/app/src/main/res/values/strings.xml
-          # Paket ismini de garantiye alalım
           sed -i 's/com.capacitor.app/com.kaftarmedia.game2/g' android/app/build.gradle
 
       - name: Copy web assets to Android
@@ -67,6 +66,7 @@ jobs:
 
       - name: Decode Keystore
         run: |
+          # Bu adım için GitHub Secrets kısmında KEYSTORE_BASE64 tanımlı olmalıdır.
           echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > $GITHUB_WORKSPACE/kaftar-release.keystore
 
       - name: Make Gradle wrapper executable
@@ -75,6 +75,8 @@ jobs:
       - name: Build AAB (Release - signed)
         run: |
           cd android
+          # Google Play Console'da "Sürüm kodu kullanıldı" hatası almamak için kodu otomatik arttırabiliriz
+          # Ancak şimdilik manuel gidelim.
           ./gradlew bundleRelease \
             -Pandroid.injected.signing.store.file=$GITHUB_WORKSPACE/kaftar-release.keystore \
             -Pandroid.injected.signing.store.password=${{ secrets.KEYSTORE_PASSWORD }} \
