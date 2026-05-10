@@ -28,6 +28,10 @@ jobs:
         run: |
           npx cap add android
 
+      - name: Install Android SDK 35
+        run: |
+          echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platforms;android-35" "build-tools;35.0.0"
+
       - name: Set Target SDK 35
         run: |
           sed -i 's/compileSdkVersion rootProject.ext.compileSdkVersion/compileSdkVersion 35/' android/app/build.gradle
@@ -36,10 +40,6 @@ jobs:
       - name: Bump Version Code
         run: |
           sed -i 's/versionCode .*/versionCode 10/' android/app/build.gradle
-
-      - name: Check Version Code
-        run: |
-          cat android/app/build.gradle | grep -i version
 
       - name: Fix Kotlin Duplicate Classes
         run: |
