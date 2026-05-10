@@ -28,25 +28,41 @@ jobs:
         run: |
           npx cap add android
 
-      - name: Fix SDK Version
+      - name: Fix SDK and Version
         run: |
-          sed -i 's/compileSdk = .*/compileSdk = 35/' android/variables.gradle
-          sed -i 's/targetSdk = .*/targetSdk = 35/' android/variables.gradle
-          sed -i 's/compileSdkVersion = .*/compileSdkVersion = 35/' android/variables.gradle
-          sed -i 's/targetSdkVersion = .*/targetSdkVersion = 35/' android/variables.gradle
+          python3 - <<'EOF'
+          import re
 
-      - name: Fix Android Gradle Plugin
-        run: |
-          sed -i "s/classpath 'com.android.tools.build:gradle:.*/classpath 'com.android.tools.build:gradle:8.2.2'/" android/build.gradle
-          sed -i 's/com.android.tools.build:gradle:.*/com.android.tools.build:gradle:8.2.2"/' android/build.gradle
+          # variables.gradle
+          with open('android/variables.gradle', 'r') as f:
+              content = f.read()
+          content = re.sub(r'compileSdk\s*=\s*\d+', 'compileSdk = 35', content)
+          content = re.sub(r'targetSdk\s*=\s*\d+', 'targetSdk = 35', content)
+          content = re.sub(r'compileSdkVersion\s*=\s*\d+', 'compileSdkVersion = 35', content)
+          content = re.sub(r'targetSdkVersion\s*=\s*\d+', 'targetSdkVersion = 35', content)
+          with open('android/variables.gradle', 'w') as f:
+              f.write(content)
+
+          # app/build.gradle - versionCode
+          with open('android/app/build.gradle', 'r') as f:
+              content = f.read()
+          content = re.sub(r'versionCode\s+\d+', 'versionCode 11', content)
+          with open('android/app/build.gradle', 'w') as f:
+              f.write(content)
+
+          # build.gradle - Android Gradle Plugin
+          with open('android/build.gradle', 'r') as f:
+              content = f.read()
+          content = re.sub(r'com\.android\.tools\.build:gradle:[^\'"]+', 'com.android.tools.build:gradle:8.2.2', content)
+          with open('android/build.gradle', 'w') as f:
+              f.write(content)
+
+          print("Done!")
+          EOF
 
       - name: Install Android SDK 35
         run: |
-          echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platforms;android-35" "build-tools;35.0.0" --channel=0
-
-      - name: Bump Version Code
-        run: |
-          sed -i 's/versionCode .*/versionCode 11/' android/app/build.gradle
+          echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platforms;android-35" "build-tools;35.0.0"
 
       - name: Fix Kotlin Duplicate Classes
         run: |
