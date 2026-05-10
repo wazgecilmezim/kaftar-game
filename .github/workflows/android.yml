@@ -57,6 +57,13 @@ jobs:
           with open('android/build.gradle', 'w') as f:
               f.write(content)
 
+          # gradle-wrapper.properties - Gradle version
+          with open('android/gradle/wrapper/gradle-wrapper.properties', 'r') as f:
+              content = f.read()
+          content = re.sub(r'gradle-[\d.]+-all\.zip', 'gradle-8.2-all.zip', content)
+          with open('android/gradle/wrapper/gradle-wrapper.properties', 'w') as f:
+              f.write(content)
+
           print("Done!")
           EOF
 
