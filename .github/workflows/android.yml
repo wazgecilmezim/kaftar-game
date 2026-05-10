@@ -28,6 +28,13 @@ jobs:
         run: |
           npx cap add android
 
+      - name: Set Target SDK 35
+        run: |
+          sed -i 's/targetSdkVersion = .*/targetSdkVersion = 35/' android/app/build.gradle
+          sed -i 's/compileSdkVersion = .*/compileSdkVersion = 35/' android/app/build.gradle
+          sed -i 's/targetSdk = .*/targetSdk = 35/' android/app/build.gradle
+          sed -i 's/compileSdk = .*/compileSdk = 35/' android/app/build.gradle
+
       - name: Fix Kotlin Duplicate Classes
         run: |
           echo "configurations.all {
