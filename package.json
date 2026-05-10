@@ -1,7 +1,7 @@
 {
   "name": "kaftar-game",
   "version": "1.0.0",
-  "description": "Kaftar Game Tetris Edition",
+  "description": "Kaftar Game Edition",
   "main": "index.js",
   "dependencies": {
     "@capacitor/android": "^5.0.0",
