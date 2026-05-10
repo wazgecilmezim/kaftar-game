@@ -28,14 +28,13 @@ jobs:
         run: |
           npx cap add android
 
-      - name: Install Android SDK 35
+      - name: Fix SDK Version
         run: |
-          echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platforms;android-35" "build-tools;35.0.0"
-
-      - name: Set Target SDK 35
-        run: |
-          sed -i 's/compileSdkVersion rootProject.ext.compileSdkVersion/compileSdkVersion 35/' android/app/build.gradle
-          sed -i 's/targetSdkVersion rootProject.ext.targetSdkVersion/targetSdkVersion 35/' android/app/build.gradle
+          sed -i 's/compileSdk = .*/compileSdk = 33/' android/variables.gradle
+          sed -i 's/targetSdk = .*/targetSdk = 33/' android/variables.gradle
+          sed -i 's/compileSdkVersion = .*/compileSdkVersion = 33/' android/variables.gradle
+          sed -i 's/targetSdkVersion = .*/targetSdkVersion = 33/' android/variables.gradle
+          cat android/variables.gradle
 
       - name: Bump Version Code
         run: |
