@@ -39,6 +39,10 @@ jobs:
         run: |
           sed -i 's/versionCode = .*/versionCode = 10/' android/app/build.gradle
 
+      - name: Check Version Code
+        run: |
+          cat android/app/build.gradle | grep -i version
+
       - name: Fix Kotlin Duplicate Classes
         run: |
           echo "configurations.all {
