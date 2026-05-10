@@ -30,15 +30,23 @@ jobs:
 
       - name: Fix SDK Version
         run: |
-          sed -i 's/compileSdk = .*/compileSdk = 33/' android/variables.gradle
-          sed -i 's/targetSdk = .*/targetSdk = 33/' android/variables.gradle
-          sed -i 's/compileSdkVersion = .*/compileSdkVersion = 33/' android/variables.gradle
-          sed -i 's/targetSdkVersion = .*/targetSdkVersion = 33/' android/variables.gradle
-          cat android/variables.gradle
+          sed -i 's/compileSdk = .*/compileSdk = 35/' android/variables.gradle
+          sed -i 's/targetSdk = .*/targetSdk = 35/' android/variables.gradle
+          sed -i 's/compileSdkVersion = .*/compileSdkVersion = 35/' android/variables.gradle
+          sed -i 's/targetSdkVersion = .*/targetSdkVersion = 35/' android/variables.gradle
+
+      - name: Fix Android Gradle Plugin
+        run: |
+          sed -i "s/classpath 'com.android.tools.build:gradle:.*/classpath 'com.android.tools.build:gradle:8.2.2'/" android/build.gradle
+          sed -i 's/com.android.tools.build:gradle:.*/com.android.tools.build:gradle:8.2.2"/' android/build.gradle
+
+      - name: Install Android SDK 35
+        run: |
+          echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platforms;android-35" "build-tools;35.0.0" --channel=0
 
       - name: Bump Version Code
         run: |
-          sed -i 's/versionCode .*/versionCode 10/' android/app/build.gradle
+          sed -i 's/versionCode .*/versionCode 11/' android/app/build.gradle
 
       - name: Fix Kotlin Duplicate Classes
         run: |
