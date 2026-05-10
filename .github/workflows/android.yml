@@ -30,14 +30,12 @@ jobs:
 
       - name: Set Target SDK 35
         run: |
-          sed -i 's/targetSdkVersion = .*/targetSdkVersion = 35/' android/app/build.gradle
-          sed -i 's/compileSdkVersion = .*/compileSdkVersion = 35/' android/app/build.gradle
-          sed -i 's/targetSdk = .*/targetSdk = 35/' android/app/build.gradle
-          sed -i 's/compileSdk = .*/compileSdk = 35/' android/app/build.gradle
+          sed -i 's/compileSdkVersion rootProject.ext.compileSdkVersion/compileSdkVersion 35/' android/app/build.gradle
+          sed -i 's/targetSdkVersion rootProject.ext.targetSdkVersion/targetSdkVersion 35/' android/app/build.gradle
 
       - name: Bump Version Code
         run: |
-          sed -i 's/versionCode = .*/versionCode = 10/' android/app/build.gradle
+          sed -i 's/versionCode .*/versionCode 10/' android/app/build.gradle
 
       - name: Check Version Code
         run: |
