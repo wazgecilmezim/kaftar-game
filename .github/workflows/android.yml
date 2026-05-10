@@ -35,6 +35,10 @@ jobs:
           sed -i 's/targetSdk = .*/targetSdk = 35/' android/app/build.gradle
           sed -i 's/compileSdk = .*/compileSdk = 35/' android/app/build.gradle
 
+      - name: Bump Version Code
+        run: |
+          sed -i 's/versionCode = .*/versionCode = 2/' android/app/build.gradle
+
       - name: Fix Kotlin Duplicate Classes
         run: |
           echo "configurations.all {
