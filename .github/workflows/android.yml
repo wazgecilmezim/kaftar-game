@@ -37,7 +37,7 @@ jobs:
 
       - name: Bump Version Code
         run: |
-          sed -i 's/versionCode = .*/versionCode = 2/' android/app/build.gradle
+          sed -i 's/versionCode = .*/versionCode = 10/' android/app/build.gradle
 
       - name: Fix Kotlin Duplicate Classes
         run: |
