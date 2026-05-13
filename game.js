@@ -6,26 +6,19 @@ const ROWS = 20;
 
 // ─── PIECES ─────────────────────────────────────────────────────
 const PIECES = [
-  // I
   { shape: [[1,1,1,1]], color: '#00ffcc' },
-  // O
   { shape: [[1,1],[1,1]], color: '#ffe600' },
-  // T
   { shape: [[0,1,0],[1,1,1]], color: '#cc44ff' },
-  // S
   { shape: [[0,1,1],[1,1,0]], color: '#44ff66' },
-  // Z
   { shape: [[1,1,0],[0,1,1]], color: '#ff3366' },
-  // J
   { shape: [[1,0,0],[1,1,1]], color: '#ff8800' },
-  // L
   { shape: [[0,0,1],[1,1,1]], color: '#0088ff' },
 ];
 
 // ─── SCORING ────────────────────────────────────────────────────
 const LINE_SCORES = [0, 100, 300, 500, 800];
 const LINES_PER_LEVEL = 10;
-const BASE_INTERVAL = 800; // ms at level 1
+const BASE_INTERVAL = 800;
 const MIN_INTERVAL  = 80;
 
 // ─── STATE ──────────────────────────────────────────────────────
@@ -104,7 +97,7 @@ function clearLines() {
       board.splice(r, 1);
       board.unshift(new Array(COLS).fill(0));
       cleared++;
-      r++; // recheck same row
+      r++;
     }
   }
   if (cleared) {
@@ -121,7 +114,6 @@ function drawBoard() {
   canvas.width  = COLS * cell;
   canvas.height = ROWS * cell;
 
-  // Background grid
   ctx.fillStyle = '#0d0d14';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -133,17 +125,12 @@ function drawBoard() {
     }
   }
 
-  // Locked cells
   for (let r = 0; r < ROWS; r++) {
     for (let c = 0; c < COLS; c++) {
       if (board[r][c]) drawCell(ctx, c, r, board[r][c], cell);
     }
   }
 
-  // Ghost piece
-  if (!gameOver && current) drawGhost(cell);
-
-  // Active piece
   if (!gameOver && current) {
     for (let r = 0; r < current.shape.length; r++) {
       for (let c = 0; c < current.shape[r].length; c++) {
@@ -153,26 +140,11 @@ function drawBoard() {
   }
 }
 
-function drawGhost(cell) {
-  let dy = 0;
-  while (!collides(current, 0, dy + 1)) dy++;
-  if (dy === 0) return;
-  ctx.globalAlpha = 0.18;
-  for (let r = 0; r < current.shape.length; r++) {
-    for (let c = 0; c < current.shape[r].length; c++) {
-      if (current.shape[r][c]) drawCell(ctx, current.x + c, current.y + r + dy, current.color, cell);
-    }
-  }
-  ctx.globalAlpha = 1;
-}
-
 function drawCell(context, x, y, color, cell) {
   context.fillStyle = color;
   context.fillRect(x * cell + 1, y * cell + 1, cell - 2, cell - 2);
-  // Shine
   context.fillStyle = 'rgba(255,255,255,0.18)';
   context.fillRect(x * cell + 1, y * cell + 1, cell - 2, 4);
-  // Border glow
   context.strokeStyle = 'rgba(255,255,255,0.12)';
   context.lineWidth = 1;
   context.strokeRect(x * cell + 1, y * cell + 1, cell - 2, cell - 2);
@@ -306,7 +278,6 @@ document.getElementById('rotateBtn').addEventListener('click',   rotatePiece);
 document.getElementById('hardDropBtn').addEventListener('click', hardDrop);
 document.getElementById('restartBtn').addEventListener('click',  initGame);
 
-// Touch hold for left/right
 let holdInterval = null;
 function startHold(fn) {
   fn();
@@ -322,7 +293,6 @@ function stopHold() { clearInterval(holdInterval); holdInterval = null; }
   btn.addEventListener('touchcancel',stopHold);
 });
 
-// Keyboard
 document.addEventListener('keydown', e => {
   switch (e.key) {
     case 'ArrowLeft':  e.preventDefault(); moveLeft();    break;
@@ -340,7 +310,6 @@ document.addEventListener('keydown', e => {
   }
 });
 
-// Swipe / touch on canvas
 let touchStartX = 0, touchStartY = 0;
 canvas.addEventListener('touchstart', e => {
   touchStartX = e.touches[0].clientX;
@@ -355,9 +324,7 @@ canvas.addEventListener('touchend', e => {
   else               { dy > 0 ? hardDrop() : rotatePiece(); }
 }, { passive: true });
 
-// Resize
 window.addEventListener('resize', () => { resizeCanvas(); drawBoard(); });
 
-// ─── START ───────────────────────────────────────────────────────
 resizeCanvas();
 initGame();
