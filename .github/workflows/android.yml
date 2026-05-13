@@ -17,7 +17,7 @@ jobs:
       - name: Install Dependencies
         run: |
           npm install
-          npm install @capacitor/android
+          npm install @capacitor/android @capacitor/assets
 
       - name: Prepare Web Assets
         run: |
@@ -27,6 +27,12 @@ jobs:
       - name: Initialize Capacitor Android
         run: |
           npx cap add android
+
+      # OTOMATİK İKON OLUŞTURMA
+      - name: Generate App Icons
+        run: |
+          cp "kaftar game.png" icon.png
+          npx capacitor-assets generate --android
 
       - name: Fix SDK and Version
         run: |
@@ -44,7 +50,8 @@ jobs:
 
           with open('android/app/build.gradle', 'r') as f:
               content = f.read()
-          content = re.sub(r'versionCode\s+\d+', 'versionCode 12', content)
+          # VERSİYON KODUNU 14 YAPTIK
+          content = re.sub(r'versionCode\s+\d+', 'versionCode 14', content)
           with open('android/app/build.gradle', 'w') as f:
               f.write(content)
 
@@ -62,17 +69,6 @@ jobs:
 
           print("Done!")
           EOF
-
-      - name: Install Android SDK 35
-        run: |
-          echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platforms;android-35" "build-tools;35.0.0"
-
-      - name: Fix Kotlin Duplicate Classes
-        run: |
-          echo "configurations.all {
-              exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk7'
-              exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk8'
-          }" >> android/app/build.gradle
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -103,5 +99,5 @@ jobs:
       - name: Upload Signed AAB
         uses: actions/upload-artifact@v4
         with:
-          name: signed-kaftar-game-3
+          name: signed-kaftar-game-14
           path: android/app/build/outputs/bundle/release/app-release-signed.aab
