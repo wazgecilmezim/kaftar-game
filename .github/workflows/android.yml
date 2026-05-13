@@ -28,17 +28,21 @@ jobs:
         run: |
           npx cap add android
 
-      # OTOMATİK İKON OLUŞTURMA
+      # --- İKONLARI OTOMATİK OLUŞTURMA VE YERLEŞTİRME ---
       - name: Generate App Icons
         run: |
-          cp "kaftar game.png" icon.png
+          # Boşluklu dosya ismini "icon.png" olarak kopyalıyoruz
+          cp "kaftar game.png" icon.png || cp kaftar*.png icon.png
+          # Android klasörlerine ikonları dağıtıyoruz
           npx capacitor-assets generate --android
+      # ------------------------------------------------
 
       - name: Fix SDK and Version
         run: |
           python3 - <<'EOF'
           import re
 
+          # SDK Ayarları
           with open('android/variables.gradle', 'r') as f:
               content = f.read()
           content = re.sub(r'compileSdk\s*=\s*\d+', 'compileSdk = 35', content)
@@ -48,13 +52,14 @@ jobs:
           with open('android/variables.gradle', 'w') as f:
               f.write(content)
 
+          # Versiyon Güncelleme (Version 16)
           with open('android/app/build.gradle', 'r') as f:
               content = f.read()
-          # VERSİYON KODUNU 14 YAPTIK
-          content = re.sub(r'versionCode\s+\d+', 'versionCode 14', content)
+          content = re.sub(r'versionCode\s+\d+', 'versionCode 16', content)
           with open('android/app/build.gradle', 'w') as f:
               f.write(content)
 
+          # Gradle Uyumluluk Ayarları
           with open('android/build.gradle', 'r') as f:
               content = f.read()
           content = re.sub(r'com\.android\.tools\.build:gradle:[^\'"]+', 'com.android.tools.build:gradle:8.2.2', content)
@@ -66,8 +71,6 @@ jobs:
           content = re.sub(r'gradle-[\d.]+-all\.zip', 'gradle-8.2-all.zip', content)
           with open('android/gradle/wrapper/gradle-wrapper.properties', 'w') as f:
               f.write(content)
-
-          print("Done!")
           EOF
 
       - name: Set up JDK 17
@@ -99,5 +102,5 @@ jobs:
       - name: Upload Signed AAB
         uses: actions/upload-artifact@v4
         with:
-          name: signed-kaftar-game-14
+          name: signed-kaftar-game-16
           path: android/app/build/outputs/bundle/release/app-release-signed.aab
