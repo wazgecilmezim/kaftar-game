@@ -28,53 +28,63 @@ jobs:
         run: |
           npx cap add android
 
-      # --- İKON OLUŞTURMA SÜRECİ ---
+      # --- İKON OLUŞTURMA ---
       - name: Generate App Icons
         run: |
-          # Boşluklu JPEG dosyasını bulup icon.png olarak hazırlıyoruz
           if [ -f "kaftar game.jpeg" ]; then
             cp "kaftar game.jpeg" icon.png
           elif [ -f "kaftar game.jpg" ]; then
             cp "kaftar game.jpg" icon.png
           fi
 
-          # İkonları Android projesine dağıtıyoruz
           if [ -f icon.png ]; then
             npx capacitor-assets generate --android
-          else
-            echo "HATA: kaftar game.jpeg dosyası bulunamadı!"
-            exit 1
           fi
 
+      # --- API 35 VE VERSİYON 21 GÜNCELLEMESİ ---
       - name: Fix SDK and Version
         run: |
           python3 - <<'EOF'
           import re
+          import os
 
-          with open('android/variables.gradle', 'r') as f:
+          # 1. variables.gradle Güncelleme
+          var_path = 'android/variables.gradle'
+          if os.path.exists(var_path):
+              with open(var_path, 'r') as f:
+                  content = f.read()
+              content = re.sub(r'compileSdk\s*=\s*\d+', 'compileSdk = 35', content)
+              content = re.sub(r'targetSdk\s*=\s*\d+', 'targetSdk = 35', content)
+              with open(var_path, 'w') as f:
+                  f.write(content)
+
+          # 2. app/build.gradle Güncelleme (Kesin çözüm için burayı da zorluyoruz)
+          app_gradle_path = 'android/app/build.gradle'
+          with open(app_gradle_path, 'r') as f:
               content = f.read()
-          content = re.sub(r'compileSdk\s*=\s*\d+', 'compileSdk = 35', content)
-          content = re.sub(r'targetSdk\s*=\s*\d+', 'targetSdk = 35', content)
-          with open('android/variables.gradle', 'w') as f:
+          
+          # API Düzeylerini 35 yap
+          content = re.sub(r'compileSdk\s+\d+', 'compileSdk 35', content)
+          content = re.sub(r'targetSdk\s+\d+', 'targetSdk 35', content)
+          # Versiyon Kodunu 21 yap
+          content = re.sub(r'versionCode\s+\d+', 'versionCode 21', content)
+          
+          with open(app_gradle_path, 'w') as f:
               f.write(content)
 
-          # VERSİYON KODUNU 20 YAPTIK
-          with open('android/app/build.gradle', 'r') as f:
-              content = f.read()
-          content = re.sub(r'versionCode\s+\d+', 'versionCode 20', content)
-          with open('android/app/build.gradle', 'w') as f:
-              f.write(content)
-
-          with open('android/build.gradle', 'r') as f:
+          # 3. Gradle ve Wrapper Güncelleme
+          build_gradle = 'android/build.gradle'
+          with open(build_gradle, 'r') as f:
               content = f.read()
           content = re.sub(r'com\.android\.tools\.build:gradle:[^\'"]+', 'com.android.tools.build:gradle:8.2.2', content)
-          with open('android/build.gradle', 'w') as f:
+          with open(build_gradle, 'w') as f:
               f.write(content)
 
-          with open('android/gradle/wrapper/gradle-wrapper.properties', 'r') as f:
+          wrapper_path = 'android/gradle/wrapper/gradle-wrapper.properties'
+          with open(wrapper_path, 'r') as f:
               content = f.read()
           content = re.sub(r'gradle-[\d.]+-all\.zip', 'gradle-8.2-all.zip', content)
-          with open('android/gradle/wrapper/gradle-wrapper.properties', 'w') as f:
+          with open(wrapper_path, 'w') as f:
               f.write(content)
           EOF
 
@@ -107,5 +117,5 @@ jobs:
       - name: Upload Signed AAB
         uses: actions/upload-artifact@v4
         with:
-          name: signed-kaftar-game-20
+          name: signed-kaftar-game-21
           path: android/app/build/outputs/bundle/release/app-release-signed.aab
