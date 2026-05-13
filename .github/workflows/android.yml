@@ -41,51 +41,45 @@ jobs:
             npx capacitor-assets generate --android
           fi
 
-      # --- API 35 VE VERSİYON 21 GÜNCELLEMESİ ---
+      # --- API 35 VE VERSİYON 22 ZORLAMASI ---
       - name: Fix SDK and Version
         run: |
           python3 - <<'EOF'
           import re
           import os
 
-          # 1. variables.gradle Güncelleme
-          var_path = 'android/variables.gradle'
-          if os.path.exists(var_path):
-              with open(var_path, 'r') as f:
+          def force_update(file_path, patterns):
+              if not os.path.exists(file_path):
+                  return
+              with open(file_path, 'r') as f:
                   content = f.read()
-              content = re.sub(r'compileSdk\s*=\s*\d+', 'compileSdk = 35', content)
-              content = re.sub(r'targetSdk\s*=\s*\d+', 'targetSdk = 35', content)
-              with open(var_path, 'w') as f:
+              for pattern, replacement in patterns:
+                  content = re.sub(pattern, replacement, content)
+              with open(file_path, 'w') as f:
                   f.write(content)
 
-          # 2. app/build.gradle Güncelleme (Kesin çözüm için burayı da zorluyoruz)
-          app_gradle_path = 'android/app/build.gradle'
-          with open(app_gradle_path, 'r') as f:
-              content = f.read()
-          
-          # API Düzeylerini 35 yap
-          content = re.sub(r'compileSdk\s+\d+', 'compileSdk 35', content)
-          content = re.sub(r'targetSdk\s+\d+', 'targetSdk 35', content)
-          # Versiyon Kodunu 21 yap
-          content = re.sub(r'versionCode\s+\d+', 'versionCode 21', content)
-          
-          with open(app_gradle_path, 'w') as f:
-              f.write(content)
+          # 1. variables.gradle Güncelleme
+          force_update('android/variables.gradle', [
+              (r'compileSdk\s*=\s*\d+', 'compileSdk = 35'),
+              (r'targetSdk\s*=\s*\d+', 'targetSdk = 35')
+          ])
+
+          # 2. app/build.gradle Güncelleme (Agresif Mod)
+          force_update('android/app/build.gradle', [
+              (r'compileSdk\s+\d+', 'compileSdk 35'),
+              (r'targetSdk\s+\d+', 'targetSdk 35'),
+              (r'versionCode\s+\d+', 'versionCode 22'),
+              (r'compileSdkVersion\s+\d+', 'compileSdkVersion 35'),
+              (r'targetSdkVersion\s+\d+', 'targetSdkVersion 35')
+          ])
 
           # 3. Gradle ve Wrapper Güncelleme
-          build_gradle = 'android/build.gradle'
-          with open(build_gradle, 'r') as f:
-              content = f.read()
-          content = re.sub(r'com\.android\.tools\.build:gradle:[^\'"]+', 'com.android.tools.build:gradle:8.2.2', content)
-          with open(build_gradle, 'w') as f:
-              f.write(content)
-
-          wrapper_path = 'android/gradle/wrapper/gradle-wrapper.properties'
-          with open(wrapper_path, 'r') as f:
-              content = f.read()
-          content = re.sub(r'gradle-[\d.]+-all\.zip', 'gradle-8.2-all.zip', content)
-          with open(wrapper_path, 'w') as f:
-              f.write(content)
+          force_update('android/build.gradle', [
+              (r'com\.android\.tools\.build:gradle:[^\'"]+', 'com.android.tools.build:gradle:8.2.2')
+          ])
+          force_update('android/gradle/wrapper/gradle-wrapper.properties', [
+              (r'gradle-[\d.]+-all\.zip', 'gradle-8.2-all.zip')
+          ])
           EOF
 
       - name: Set up JDK 17
@@ -117,5 +111,5 @@ jobs:
       - name: Upload Signed AAB
         uses: actions/upload-artifact@v4
         with:
-          name: signed-kaftar-game-21
+          name: signed-kaftar-game-22
           path: android/app/build/outputs/bundle/release/app-release-signed.aab
