@@ -33,7 +33,6 @@ jobs:
           python3 - <<'EOF'
           import re
 
-          # variables.gradle
           with open('android/variables.gradle', 'r') as f:
               content = f.read()
           content = re.sub(r'compileSdk\s*=\s*\d+', 'compileSdk = 35', content)
@@ -43,21 +42,18 @@ jobs:
           with open('android/variables.gradle', 'w') as f:
               f.write(content)
 
-          # app/build.gradle - versionCode
           with open('android/app/build.gradle', 'r') as f:
               content = f.read()
-          content = re.sub(r'versionCode\s+\d+', 'versionCode 11', content)
+          content = re.sub(r'versionCode\s+\d+', 'versionCode 12', content)
           with open('android/app/build.gradle', 'w') as f:
               f.write(content)
 
-          # build.gradle - Android Gradle Plugin
           with open('android/build.gradle', 'r') as f:
               content = f.read()
           content = re.sub(r'com\.android\.tools\.build:gradle:[^\'"]+', 'com.android.tools.build:gradle:8.2.2', content)
           with open('android/build.gradle', 'w') as f:
               f.write(content)
 
-          # gradle-wrapper.properties - Gradle version
           with open('android/gradle/wrapper/gradle-wrapper.properties', 'r') as f:
               content = f.read()
           content = re.sub(r'gradle-[\d.]+-all\.zip', 'gradle-8.2-all.zip', content)
