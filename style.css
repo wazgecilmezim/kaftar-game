@@ -8,7 +8,6 @@
   --accent2: #ff3366;
   --text: #e0e0f0;
   --muted: #555577;
-  --cell: 28px;
 }
 
 * {
@@ -34,11 +33,11 @@ html, body {
   height: 100dvh;
   max-width: 420px;
   margin: 0 auto;
-  padding: 8px 10px 4px;
+  padding: 8px 10px 0;
+  padding-bottom: calc(env(safe-area-inset-bottom) + 10px);
   gap: 6px;
 }
 
-/* HEADER */
 .header {
   display: flex;
   justify-content: space-between;
@@ -59,9 +58,7 @@ html, body {
   text-shadow: 0 0 12px var(--accent);
 }
 
-.score-block {
-  text-align: right;
-}
+.score-block { text-align: right; }
 
 .score-lbl {
   font-size: 9px;
@@ -76,7 +73,6 @@ html, body {
   color: var(--accent);
 }
 
-/* MID ROW */
 .mid-row {
   display: flex;
   flex: 1;
@@ -93,6 +89,8 @@ html, body {
   border: 1px solid var(--border);
   border-radius: 6px;
   padding: 4px;
+  min-width: 0;
+  overflow: hidden;
 }
 
 #boardCanvas {
@@ -100,12 +98,11 @@ html, body {
   image-rendering: pixelated;
 }
 
-/* SIDE PANEL */
 .side-panel {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  width: 84px;
+  width: 72px;
   flex-shrink: 0;
 }
 
@@ -113,7 +110,7 @@ html, body {
   background: var(--panel);
   border: 1px solid var(--border);
   border-radius: 6px;
-  padding: 6px;
+  padding: 6px 4px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -121,24 +118,21 @@ html, body {
 }
 
 .mini-lbl {
-  font-size: 8px;
-  letter-spacing: 1.5px;
+  font-size: 7px;
+  letter-spacing: 1px;
   color: var(--muted);
 }
 
-#nextCanvas {
-  display: block;
-}
+#nextCanvas { display: block; }
 
 .level-val,
 .lines-val {
   font-family: 'Orbitron', sans-serif;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 700;
   color: var(--accent2);
 }
 
-/* STATUS BAR */
 .status-bar {
   text-align: center;
   font-size: 11px;
@@ -151,7 +145,6 @@ html, body {
   flex-shrink: 0;
 }
 
-/* CONTROLS */
 .controls {
   display: flex;
   justify-content: center;
@@ -162,8 +155,8 @@ html, body {
 }
 
 .ctrl-btn {
-  width: 56px;
-  height: 56px;
+  width: 54px;
+  height: 54px;
   background: var(--panel);
   border: 1px solid var(--border);
   border-radius: 8px;
@@ -175,6 +168,7 @@ html, body {
   align-items: center;
   justify-content: center;
   -webkit-user-select: none;
+  touch-action: manipulation;
 }
 
 .ctrl-btn:active {
@@ -184,8 +178,8 @@ html, body {
 }
 
 .restart-btn {
-  width: 46px;
-  height: 46px;
+  width: 44px;
+  height: 44px;
   background: transparent;
   border: 1px solid var(--accent2);
   border-radius: 8px;
@@ -196,6 +190,7 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: center;
+  touch-action: manipulation;
 }
 
 .restart-btn:active {
@@ -203,7 +198,6 @@ html, body {
   transform: scale(0.93);
 }
 
-/* FOOTER */
 footer {
   text-align: center;
   font-size: 9px;
@@ -213,7 +207,6 @@ footer {
   flex-shrink: 0;
 }
 
-/* OVERLAY (game over / pause) */
 .overlay {
   position: fixed;
   inset: 0;
