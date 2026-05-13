@@ -31,6 +31,7 @@ jobs:
       # --- İKON OLUŞTURMA ---
       - name: Generate App Icons
         run: |
+          # Dosya ismindeki boşluğu tırnaklarla koruyarak kopyalıyoruz
           if [ -f "kaftar game.jpeg" ]; then
             cp "kaftar game.jpeg" icon.png
           elif [ -f "kaftar game.jpg" ]; then
@@ -41,45 +42,45 @@ jobs:
             npx capacitor-assets generate --android
           fi
 
-      # --- API 35 VE VERSİYON 22 ZORLAMASI ---
+      # --- API 35 VE VERSİYON 23 ZORLAMASI ---
       - name: Fix SDK and Version
         run: |
           python3 - <<'EOF'
           import re
           import os
 
-          def force_update(file_path, patterns):
-              if not os.path.exists(file_path):
-                  return
+          def total_overwrite(file_path, search_pattern, replacement):
+              if not os.path.exists(file_path): return
               with open(file_path, 'r') as f:
                   content = f.read()
-              for pattern, replacement in patterns:
-                  content = re.sub(pattern, replacement, content)
+              # Dosya içinde API 33 veya 34 geçen her yeri 35 ile değiştirir
+              new_content = re.sub(search_pattern, replacement, content)
               with open(file_path, 'w') as f:
-                  f.write(content)
+                  f.write(new_content)
 
-          # 1. variables.gradle Güncelleme
-          force_update('android/variables.gradle', [
-              (r'compileSdk\s*=\s*\d+', 'compileSdk = 35'),
-              (r'targetSdk\s*=\s*\d+', 'targetSdk = 35')
-          ])
+          # 1. variables.gradle: Tüm SDK değerlerini 35 yap
+          total_overwrite('android/variables.gradle', r'(compileSdk|targetSdk|minSdk|compileSdkVersion|targetSdkVersion)\s*=\s*\d+', r'\1 = 35')
+          # minSdk'yi genelde 22 veya 24 yaparız, eğer hata alırsan burayı ayırabiliriz.
 
-          # 2. app/build.gradle Güncelleme (Agresif Mod)
-          force_update('android/app/build.gradle', [
-              (r'compileSdk\s+\d+', 'compileSdk 35'),
-              (r'targetSdk\s+\d+', 'targetSdk 35'),
-              (r'versionCode\s+\d+', 'versionCode 22'),
-              (r'compileSdkVersion\s+\d+', 'compileSdkVersion 35'),
-              (r'targetSdkVersion\s+\d+', 'targetSdkVersion 35')
-          ])
+          # 2. app/build.gradle: API düzeylerini ve Versiyonu (23) zorla
+          gradle_path = 'android/app/build.gradle'
+          if os.path.exists(gradle_path):
+              with open(gradle_path, 'r') as f:
+                  c = f.read()
+              c = re.sub(r'compileSdk\s+\d+', 'compileSdk 35', c)
+              c = re.sub(r'targetSdk\s+\d+', 'targetSdk 35', c)
+              c = re.sub(r'versionCode\s+\d+', 'versionCode 23', c)
+              # Bazı eski şablonlar için:
+              c = re.sub(r'targetSdkVersion\s+\d+', 'targetSdkVersion 35', c)
+              c = re.sub(r'compileSdkVersion\s+\d+', 'compileSdkVersion 35', c)
+              with open(gradle_path, 'w') as f:
+                  f.write(c)
 
-          # 3. Gradle ve Wrapper Güncelleme
-          force_update('android/build.gradle', [
-              (r'com\.android\.tools\.build:gradle:[^\'"]+', 'com.android.tools.build:gradle:8.2.2')
-          ])
-          force_update('android/gradle/wrapper/gradle-wrapper.properties', [
-              (r'gradle-[\d.]+-all\.zip', 'gradle-8.2-all.zip')
-          ])
+          # 3. Gradle Versiyon Uyumluluğu
+          total_overwrite('android/build.gradle', r'com\.android\.tools\.build:gradle:[^\'"]+', 'com.android.tools.build:gradle:8.2.2')
+          total_overwrite('android/gradle/wrapper/gradle-wrapper.properties', r'gradle-[\d.]+-all\.zip', 'gradle-8.2-all.zip')
+          
+          print("API 35 ve Version 23 başarıyla uygulandı.")
           EOF
 
       - name: Set up JDK 17
@@ -111,5 +112,5 @@ jobs:
       - name: Upload Signed AAB
         uses: actions/upload-artifact@v4
         with:
-          name: signed-kaftar-game-22
+          name: signed-kaftar-game-23
           path: android/app/build/outputs/bundle/release/app-release-signed.aab
